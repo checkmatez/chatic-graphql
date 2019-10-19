@@ -1,0 +1,17 @@
+schema: http://localhost:${PORT}
+generates:
+  ./src/types/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-resolvers
+overwrite: true
+config:
+  noNamespaces: true
+  scalars:
+    DateTime: Date
+    Date: Date
+    Time: Date
+  contextType: ./context#Context
+hooks:
+  afterAllFileWrite:
+    - prettier --write
