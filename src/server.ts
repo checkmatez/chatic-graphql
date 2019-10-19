@@ -1,80 +1,11 @@
-import { ApolloServer, gql, UserInputError } from 'apollo-server'
-import * as jwt from 'jsonwebtoken'
+import { ApolloServer } from 'apollo-server'
 
-import { ACCESS_TOKEN_EXPIRES_IN, ENV } from './config/constants'
-import { ChatRoom, Message, User } from './config/database'
-import { TokenPayload } from './types/context'
-import { Resolvers } from './types/graphql'
-
-const typeDefs = gql`
-  type Query {
-    serviceDescription: String!
-    me: User
-  }
-
-  type Mutation {
-    login(username: String!, password: String!): LoginResult!
-  }
-
-  type User {
-    id: ID!
-    username: String!
-  }
-
-  type LoginResult {
-    accessToken: String!
-    user: User!
-  }
-`
-
-const resolvers: Resolvers = {
-  Query: {
-    serviceDescription: (): string => 'Классный чатик 😝',
-    me: async (parent, args, context, info) => {
-      if (!context.userId) {
-        return null
-      }
-      const user = await context.User.query().findById(context.userId)
-      return user
-    },
-  },
-  Mutation: {
-    login: async (parent, args, context, info) => {
-      const user = await context.User.query().findOne(args)
-      console.log('TCL: user', user)
-      if (!user) {
-        throw new UserInputError('Неправильный логин или пароль')
-      }
-
-      const payload: TokenPayload = { userId: user.id }
-      const accessToken = jwt.sign(payload, ENV.APP_SECRET, {
-        expiresIn: ACCESS_TOKEN_EXPIRES_IN,
-      })
-
-      return {
-        accessToken,
-        user,
-      }
-    },
-  },
-}
+import { context } from './config/context'
+import { schema } from './modules/_schema'
 
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: ({ req }) => {
-    let userId = null
-    const authorization = req.get('authorization')
-    if (authorization) {
-      const token = authorization.replace('Bearer ', '')
-      try {
-        const payload = jwt.verify(token, ENV.APP_SECRET) as TokenPayload
-        userId = payload.userId
-      } catch (error) {}
-    }
-
-    return { ChatRoom, Message, User, userId }
-  },
+  schema,
+  context,
   formatError: (err: Error) => {
     console.log('TCL: err', err)
 
