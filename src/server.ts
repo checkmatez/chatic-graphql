@@ -1,20 +1,14 @@
-import {
-  ApolloServer,
-  gql,
-  IResolvers,
-  ApolloError,
-  UserInputError,
-} from 'apollo-server'
+import { ApolloServer, gql, IResolvers, UserInputError } from 'apollo-server'
 import * as jwt from 'jsonwebtoken'
 
+import { ACCESS_TOKEN_EXPIRES_IN, ENV } from './config/constants'
 import { ChatRoom, Message, User } from './config/database'
-import { UniqueViolationError } from 'db-errors'
 import { Context, TokenPayload } from './types/index'
-import { ENV, ACCESS_TOKEN_EXPIRES_IN } from './config/constants'
 
 const typeDefs = gql`
   type Query {
     serviceDescription: String!
+    me: User
   }
 
   type Mutation {
@@ -35,6 +29,12 @@ const typeDefs = gql`
 const resolvers: IResolvers<any, Context> = {
   Query: {
     serviceDescription: (): string => 'Классный чатик 😝',
+    me: (parent, args, context, info) => {
+      if (!context.userId) {
+        return null
+      }
+      return context.User.query().findById(context.userId)
+    },
   },
   Mutation: {
     login: async (parent, args, context, info) => {
@@ -60,7 +60,19 @@ const resolvers: IResolvers<any, Context> = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: { ChatRoom, Message, User },
+  context: ({ req }) => {
+    let userId = null
+    const authorization = req.get('authorization')
+    if (authorization) {
+      const token = authorization.replace('Bearer ', '')
+      try {
+        const payload = jwt.verify(token, ENV.APP_SECRET) as TokenPayload
+        userId = payload.userId
+      } catch (error) {}
+    }
+
+    return { ChatRoom, Message, User, userId }
+  },
   formatError: (err: Error) => {
     console.log('TCL: err', err)
 
