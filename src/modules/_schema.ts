@@ -13,7 +13,7 @@ const typeDef = gql`
   }
 
   type Mutation {
-    noop: Boolean
+    noop: Boolean @deprecated(reason: "Dont use")
   }
 `
 
