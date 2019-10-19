@@ -2,6 +2,10 @@ import { gql, makeExecutableSchema } from 'apollo-server'
 import merge from 'lodash/merge'
 
 import { resolvers as authResolvers, typeDefs as authTypeDefs } from './auth'
+import {
+  resolvers as messagesResolvers,
+  typeDefs as messagesTypeDefs,
+} from './messages'
 
 const typeDef = gql`
   type Query {
@@ -23,6 +27,6 @@ const resolvers = {
 }
 
 export const schema = makeExecutableSchema({
-  typeDefs: [typeDef, authTypeDefs],
-  resolvers: merge(resolvers, authResolvers),
+  typeDefs: [typeDef, authTypeDefs, messagesTypeDefs],
+  resolvers: merge(resolvers, authResolvers, messagesResolvers),
 })

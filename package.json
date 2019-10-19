@@ -10,7 +10,6 @@
     "lint": "eslint src/**/*.ts",
     "format": "prettier --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "knex": "dotenv knex",
-    "k": "knex",
     "gen": "node -r dotenv/config ./node_modules/@graphql-codegen/cli/dist/commonjs/cli.js"
   },
   "dependencies": {

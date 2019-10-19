@@ -1,8 +1,5 @@
-import {
-  GraphQLResolveInfo,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig,
-} from 'graphql'
+import { GraphQLResolveInfo } from 'graphql'
+import Message from '../models/message'
 import { Context } from './context'
 export type Maybe<T> = T | null | undefined
 export type RequireFields<T, K extends keyof T> = {
@@ -16,13 +13,12 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any
 }
 
-export enum CacheControlScope {
-  Public = 'PUBLIC',
-  Private = 'PRIVATE',
+export type ChatRoom = {
+  __typename?: 'ChatRoom'
+  id: Scalars['ID']
+  name: Scalars['String']
 }
 
 export type LoginResult = {
@@ -31,9 +27,19 @@ export type LoginResult = {
   user: User
 }
 
+export type Message = {
+  __typename?: 'Message'
+  id: Scalars['ID']
+  text: Scalars['String']
+  sender: User
+  chatRoom: ChatRoom
+}
+
 export type Mutation = {
   __typename?: 'Mutation'
+  noop?: Maybe<Scalars['Boolean']>
   login: LoginResult
+  sendMessage: Message
 }
 
 export type MutationLoginArgs = {
@@ -41,10 +47,19 @@ export type MutationLoginArgs = {
   password: Scalars['String']
 }
 
+export type MutationSendMessageArgs = {
+  data: SendMessageInput
+}
+
 export type Query = {
   __typename?: 'Query'
   serviceDescription: Scalars['String']
   me?: Maybe<User>
+}
+
+export type SendMessageInput = {
+  text: Scalars['String']
+  chatId: Scalars['ID']
 }
 
 export type User = {
@@ -164,11 +179,11 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>
   ID: ResolverTypeWrapper<Scalars['ID']>
   Mutation: ResolverTypeWrapper<{}>
-  LoginResult: ResolverTypeWrapper<LoginResult>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
-  CacheControlScope: CacheControlScope
-  Upload: ResolverTypeWrapper<Scalars['Upload']>
-  Int: ResolverTypeWrapper<Scalars['Int']>
+  LoginResult: ResolverTypeWrapper<LoginResult>
+  SendMessageInput: SendMessageInput
+  Message: ResolverTypeWrapper<Message>
+  ChatRoom: ResolverTypeWrapper<ChatRoom>
 }>
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -178,22 +193,20 @@ export type ResolversParentTypes = ResolversObject<{
   User: User
   ID: Scalars['ID']
   Mutation: {}
-  LoginResult: LoginResult
   Boolean: Scalars['Boolean']
-  CacheControlScope: CacheControlScope
-  Upload: Scalars['Upload']
-  Int: Scalars['Int']
+  LoginResult: LoginResult
+  SendMessageInput: SendMessageInput
+  Message: Message
+  ChatRoom: ChatRoom
 }>
 
-export type CacheControlDirectiveResolver<
-  Result,
-  Parent,
+export type ChatRoomResolvers<
   ContextType = Context,
-  Args = {
-    maxAge?: Maybe<Maybe<Scalars['Int']>>
-    scope?: Maybe<Maybe<CacheControlScope>>
-  }
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>
+  ParentType extends ResolversParentTypes['ChatRoom'] = ResolversParentTypes['ChatRoom']
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}>
 
 export type LoginResultResolvers<
   ContextType = Context,
@@ -203,15 +216,32 @@ export type LoginResultResolvers<
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
 }>
 
+export type MessageResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  text?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  sender?: Resolver<ResolversTypes['User'], ParentType, ContextType>
+  chatRoom?: Resolver<ResolversTypes['ChatRoom'], ParentType, ContextType>
+}>
+
 export type MutationResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = ResolversObject<{
+  noop?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
   login?: Resolver<
     ResolversTypes['LoginResult'],
     ParentType,
     ContextType,
     RequireFields<MutationLoginArgs, 'username' | 'password'>
+  >
+  sendMessage?: Resolver<
+    ResolversTypes['Message'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationSendMessageArgs, 'data'>
   >
 }>
 
@@ -227,11 +257,6 @@ export type QueryResolvers<
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
 }>
 
-export interface UploadScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
-  name: 'Upload'
-}
-
 export type UserResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']
@@ -241,10 +266,11 @@ export type UserResolvers<
 }>
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
+  ChatRoom?: ChatRoomResolvers<ContextType>
   LoginResult?: LoginResultResolvers<ContextType>
+  Message?: MessageResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
-  Upload?: GraphQLScalarType
   User?: UserResolvers<ContextType>
 }>
 
@@ -253,14 +279,3 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
  */
 export type IResolvers<ContextType = Context> = Resolvers<ContextType>
-export type DirectiveResolvers<ContextType = Context> = ResolversObject<{
-  cacheControl?: CacheControlDirectiveResolver<any, any, ContextType>
-}>
-
-/**
- * @deprecated
- * Use "DirectiveResolvers" root object instead. If you wish to get "IDirectiveResolvers", add "typesPrefix: I" to your config.
- */
-export type IDirectiveResolvers<ContextType = Context> = DirectiveResolvers<
-  ContextType
->

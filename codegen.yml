@@ -13,6 +13,8 @@ config:
     Time: Date
   contextType: ./context#Context
   useIndexSignature: true
+  mappers:
+    Message: ../models/message#default
 hooks:
   afterAllFileWrite:
     - prettier --write
