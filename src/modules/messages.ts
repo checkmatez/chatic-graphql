@@ -1,13 +1,23 @@
-import { gql, UserInputError } from 'apollo-server'
-import * as jwt from 'jsonwebtoken'
+import { gql } from 'apollo-server'
 
-import { ACCESS_TOKEN_EXPIRES_IN, ENV } from '../config/constants'
-import { TokenPayload } from '../types/context'
 import { MutationResolvers, QueryResolvers } from './../types/graphql'
 
 export const typeDefs = gql`
+  extend type Query {
+    chatRoomMessages(
+      chatId: ID!
+      skip: Int = 0
+      limit: Int = 20
+    ): MessagesConnection!
+  }
+
   extend type Mutation {
     sendMessage(data: SendMessageInput!): Message!
+  }
+
+  type MessagesConnection {
+    nodes: [Message!]!
+    total: Int!
   }
 
   input SendMessageInput {
@@ -28,6 +38,18 @@ export const typeDefs = gql`
   }
 `
 
+const chatRoomMessages: QueryResolvers['chatRoomMessages'] = async (
+  _,
+  { chatId, skip, limit },
+  { userId, Message },
+) => {
+  const { results: nodes, total } = await Message.query()
+    .where('chat_room_id', chatId)
+    .range(skip, skip + limit - 1)
+
+  return { nodes, total }
+}
+
 const sendMessage: MutationResolvers['sendMessage'] = async (
   _,
   { data: { text, chatId } },
@@ -46,6 +68,9 @@ const sendMessage: MutationResolvers['sendMessage'] = async (
 }
 
 export const resolvers = {
+  Query: {
+    chatRoomMessages,
+  },
   Mutation: {
     sendMessage,
   },

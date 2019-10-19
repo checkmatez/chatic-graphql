@@ -2,6 +2,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import Message from '../models/message'
 import { Context } from './context'
 export type Maybe<T> = T | null | undefined
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type RequireFields<T, K extends keyof T> = {
   [X in Exclude<keyof T, K>]?: T[X]
 } &
@@ -35,6 +36,12 @@ export type Message = {
   chatRoom: ChatRoom
 }
 
+export type MessagesConnection = {
+  __typename?: 'MessagesConnection'
+  nodes: Array<Message>
+  total: Scalars['Int']
+}
+
 export type Mutation = {
   __typename?: 'Mutation'
   noop?: Maybe<Scalars['Boolean']>
@@ -55,6 +62,13 @@ export type Query = {
   __typename?: 'Query'
   serviceDescription: Scalars['String']
   me?: Maybe<User>
+  chatRoomMessages: MessagesConnection
+}
+
+export type QueryChatRoomMessagesArgs = {
+  chatId: Scalars['ID']
+  skip?: Maybe<Scalars['Int']>
+  limit?: Maybe<Scalars['Int']>
 }
 
 export type SendMessageInput = {
@@ -178,12 +192,18 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']>
   User: ResolverTypeWrapper<User>
   ID: ResolverTypeWrapper<Scalars['ID']>
+  Int: ResolverTypeWrapper<Scalars['Int']>
+  MessagesConnection: ResolverTypeWrapper<
+    Omit<MessagesConnection, 'nodes'> & {
+      nodes: Array<ResolversTypes['Message']>
+    }
+  >
+  Message: ResolverTypeWrapper<Message>
+  ChatRoom: ResolverTypeWrapper<ChatRoom>
   Mutation: ResolverTypeWrapper<{}>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   LoginResult: ResolverTypeWrapper<LoginResult>
   SendMessageInput: SendMessageInput
-  Message: ResolverTypeWrapper<Message>
-  ChatRoom: ResolverTypeWrapper<ChatRoom>
 }>
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -192,12 +212,16 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String']
   User: User
   ID: Scalars['ID']
+  Int: Scalars['Int']
+  MessagesConnection: Omit<MessagesConnection, 'nodes'> & {
+    nodes: Array<ResolversParentTypes['Message']>
+  }
+  Message: Message
+  ChatRoom: ChatRoom
   Mutation: {}
   Boolean: Scalars['Boolean']
   LoginResult: LoginResult
   SendMessageInput: SendMessageInput
-  Message: Message
-  ChatRoom: ChatRoom
 }>
 
 export type ChatRoomResolvers<
@@ -224,6 +248,14 @@ export type MessageResolvers<
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   sender?: Resolver<ResolversTypes['User'], ParentType, ContextType>
   chatRoom?: Resolver<ResolversTypes['ChatRoom'], ParentType, ContextType>
+}>
+
+export type MessagesConnectionResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['MessagesConnection'] = ResolversParentTypes['MessagesConnection']
+> = ResolversObject<{
+  nodes?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 }>
 
 export type MutationResolvers<
@@ -255,6 +287,12 @@ export type QueryResolvers<
     ContextType
   >
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
+  chatRoomMessages?: Resolver<
+    ResolversTypes['MessagesConnection'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryChatRoomMessagesArgs, 'chatId' | 'skip' | 'limit'>
+  >
 }>
 
 export type UserResolvers<
@@ -269,6 +307,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   ChatRoom?: ChatRoomResolvers<ContextType>
   LoginResult?: LoginResultResolvers<ContextType>
   Message?: MessageResolvers<ContextType>
+  MessagesConnection?: MessagesConnectionResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
   User?: UserResolvers<ContextType>
