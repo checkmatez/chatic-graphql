@@ -1,9 +1,10 @@
-import { ApolloServer, gql, IResolvers, UserInputError } from 'apollo-server'
+import { ApolloServer, gql, UserInputError } from 'apollo-server'
 import * as jwt from 'jsonwebtoken'
 
 import { ACCESS_TOKEN_EXPIRES_IN, ENV } from './config/constants'
 import { ChatRoom, Message, User } from './config/database'
-import { Context, TokenPayload } from './types/index'
+import { TokenPayload } from './types/context'
+import { Resolvers } from './types/graphql'
 
 const typeDefs = gql`
   type Query {
@@ -26,14 +27,15 @@ const typeDefs = gql`
   }
 `
 
-const resolvers: IResolvers<any, Context> = {
+const resolvers: Resolvers = {
   Query: {
     serviceDescription: (): string => 'Классный чатик 😝',
-    me: (parent, args, context, info) => {
+    me: async (parent, args, context, info) => {
       if (!context.userId) {
         return null
       }
-      return context.User.query().findById(context.userId)
+      const user = await context.User.query().findById(context.userId)
+      return user
     },
   },
   Mutation: {

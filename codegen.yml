@@ -12,6 +12,7 @@ config:
     Date: Date
     Time: Date
   contextType: ./context#Context
+  useIndexSignature: true
 hooks:
   afterAllFileWrite:
     - prettier --write
