@@ -5,18 +5,31 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon --ext ts,graphql --exec \"ts-node -r dotenv/config src/server.ts\"",
+    "build": "rimraf dist && tsc",
+    "test": "jest",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "knex": "dotenv knex",
+    "k": "knex",
     "gen": "node -r dotenv/config ./node_modules/@graphql-codegen/cli/dist/commonjs/cli.js"
   },
   "dependencies": {
     "apollo-server": "^2.9.6",
-    "graphql": "^14.5.8"
+    "bcryptjs": "^2.4.3",
+    "envalid": "^5.0.0",
+    "graphql": "^14.5.8",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.19.5",
+    "objection": "^1.6.11",
+    "objection-db-errors": "^1.1.1",
+    "pg": "^7.12.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.8.1",
     "@graphql-codegen/typescript": "^1.8.1",
     "@graphql-codegen/typescript-resolvers": "^1.8.1",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^8.3.5",
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
@@ -28,7 +41,7 @@
     "nodemon": "^1.19.4",
     "prettier": "^1.18.2",
     "ts-node": "^8.4.1",
-    "typescript": "^3.7.0-dev.20191018"
+    "typescript": "^3.6.4"
   },
   "husky": {
     "hooks": {

@@ -17,7 +17,10 @@ module.exports = {
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier/@typescript-eslint', // Disable conflicting rules
   ],
-  rules: {},
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+  },
   overrides: [
     {
       files: ['**/*.spec.ts'],
