@@ -10,12 +10,13 @@
     "declarationMap": true,
     "removeComments": false,
     "strict": true,
+    "noImplicitAny": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["es2017"],
     "types": ["node"],
-    "typeRoots": ["node_modules", "types"],
+    "typeRoots": ["node_modules", "src/types"],
     "rootDir": "./src",
     "outDir": "./dist"
   }

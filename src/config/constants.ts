@@ -16,3 +16,7 @@ export const ENV = cleanEnv(
 
 /** expressed in seconds or a string describing a time span zeit/ms. Eg: 60, "2 days", "10h", "7d" */
 export const ACCESS_TOKEN_EXPIRES_IN: number | string = '1d'
+
+export enum EventName {
+  CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED',
+}

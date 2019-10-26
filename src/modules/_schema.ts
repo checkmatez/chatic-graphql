@@ -15,6 +15,10 @@ const typeDef = gql`
   type Mutation {
     noop: Boolean @deprecated(reason: "Dont use")
   }
+
+  type Subscription {
+    noop: Boolean @deprecated(reason: "Dont use")
+  }
 `
 
 const resolvers = {

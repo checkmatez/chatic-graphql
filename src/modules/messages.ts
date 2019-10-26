@@ -1,6 +1,11 @@
-import { gql } from 'apollo-server'
+import { gql, withFilter } from 'apollo-server'
 
-import { MutationResolvers, QueryResolvers } from './../types/graphql'
+import {
+  MutationResolvers,
+  QueryResolvers,
+  SubscriptionResolvers,
+} from './../types/graphql'
+import { EventName } from '../config/constants'
 
 export const typeDefs = gql`
   extend type Query {
@@ -13,6 +18,10 @@ export const typeDefs = gql`
 
   extend type Mutation {
     sendMessage(data: SendMessageInput!): Message!
+  }
+
+  extend type Subscription {
+    chatMessageAdded(chatId: ID!): Message!
   }
 
   type MessagesConnection {
@@ -53,7 +62,7 @@ const chatRoomMessages: QueryResolvers['chatRoomMessages'] = async (
 const sendMessage: MutationResolvers['sendMessage'] = async (
   _,
   { data: { text, chatId } },
-  { Message, userId },
+  { Message, userId, pubsub },
 ) => {
   const message = await Message.query().insertGraph(
     {
@@ -63,8 +72,19 @@ const sendMessage: MutationResolvers['sendMessage'] = async (
     },
     { relate: true },
   )
-  console.log('TCL: message', message)
+  await pubsub.publish(EventName.CHAT_MESSAGE_ADDED, {
+    chatMessageAdded: message,
+  })
+
   return message
+}
+
+const chatMessageAdded: SubscriptionResolvers['chatMessageAdded'] = {
+  subscribe: withFilter(
+    (_, __, { pubsub }) => pubsub.asyncIterator(EventName.CHAT_MESSAGE_ADDED),
+    ({ chatMessageAdded }, { chatId }) =>
+      chatMessageAdded.chatRoomId === chatId,
+  ),
 }
 
 export const resolvers = {
@@ -73,5 +93,8 @@ export const resolvers = {
   },
   Mutation: {
     sendMessage,
+  },
+  Subscription: {
+    chatMessageAdded,
   },
 }

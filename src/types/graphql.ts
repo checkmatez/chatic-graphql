@@ -76,6 +76,16 @@ export type SendMessageInput = {
   chatId: Scalars['ID']
 }
 
+export type Subscription = {
+  __typename?: 'Subscription'
+  noop?: Maybe<Scalars['Boolean']>
+  chatMessageAdded: Message
+}
+
+export type SubscriptionChatMessageAddedArgs = {
+  chatId: Scalars['ID']
+}
+
 export type User = {
   __typename?: 'User'
   id: Scalars['ID']
@@ -204,6 +214,7 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
   LoginResult: ResolverTypeWrapper<LoginResult>
   SendMessageInput: SendMessageInput
+  Subscription: ResolverTypeWrapper<{}>
 }>
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -222,6 +233,7 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']
   LoginResult: LoginResult
   SendMessageInput: SendMessageInput
+  Subscription: {}
 }>
 
 export type ChatRoomResolvers<
@@ -295,6 +307,25 @@ export type QueryResolvers<
   >
 }>
 
+export type SubscriptionResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']
+> = ResolversObject<{
+  noop?: SubscriptionResolver<
+    Maybe<ResolversTypes['Boolean']>,
+    'noop',
+    ParentType,
+    ContextType
+  >
+  chatMessageAdded?: SubscriptionResolver<
+    ResolversTypes['Message'],
+    'chatMessageAdded',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionChatMessageAddedArgs, 'chatId'>
+  >
+}>
+
 export type UserResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']
@@ -310,6 +341,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   MessagesConnection?: MessagesConnectionResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
+  Subscription?: SubscriptionResolvers<ContextType>
   User?: UserResolvers<ContextType>
 }>
 
