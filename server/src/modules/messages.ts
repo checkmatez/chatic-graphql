@@ -36,14 +36,10 @@ export const typeDefs = gql`
 
   type Message {
     id: ID!
+    sentAt: DateTime!
     text: String!
     sender: User!
     chatRoom: ChatRoom!
-  }
-
-  type ChatRoom {
-    id: ID!
-    name: String!
   }
 `
 
@@ -64,14 +60,16 @@ const sendMessage: MutationResolvers['sendMessage'] = async (
   { data: { text, chatId } },
   { Message, userId, pubsub },
 ) => {
-  const message = await Message.query().insertGraph(
-    {
-      text,
-      chatRoom: { id: chatId },
-      author: { id: userId! },
-    },
-    { relate: true },
-  )
+  const message = await Message.query()
+    .insertGraph(
+      {
+        text,
+        chatRoom: { id: chatId },
+        author: { id: userId! },
+      },
+      { relate: true },
+    )
+    .returning('*')
   await pubsub.publish(EventName.CHAT_MESSAGE_ADDED, {
     chatMessageAdded: message,
   })
@@ -96,5 +94,8 @@ export const resolvers = {
   },
   Subscription: {
     chatMessageAdded,
+  },
+  Message: {
+    sentAt: ({ createdAt }) => createdAt,
   },
 }

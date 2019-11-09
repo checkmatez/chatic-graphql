@@ -8,6 +8,7 @@ export interface Context {
   ChatRoom: typeof ChatRoom
   Message: typeof Message
   User: typeof User
+  getGithubUser: (name: string) => Promise<any>
 }
 
 export interface TokenPayload {

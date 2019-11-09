@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import Message from '../models/message'
 import { Context } from './context'
-export type Maybe<T> = T | null | undefined
+export type Maybe<T> = T | null
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type RequireFields<T, K extends keyof T> = {
   [X in Exclude<keyof T, K>]?: T[X]
@@ -22,10 +22,10 @@ export type ChatRoom = {
   name: Scalars['String']
 }
 
-export type LoginResult = {
-  __typename?: 'LoginResult'
-  accessToken: Scalars['String']
-  user: User
+export type ChatRoomsConnection = {
+  __typename?: 'ChatRoomsConnection'
+  nodes: Array<ChatRoom>
+  total: Scalars['Int']
 }
 
 export type Message = {
@@ -45,13 +45,12 @@ export type MessagesConnection = {
 export type Mutation = {
   __typename?: 'Mutation'
   noop?: Maybe<Scalars['Boolean']>
-  login: LoginResult
+  register: RegisterResult
   sendMessage: Message
 }
 
-export type MutationLoginArgs = {
+export type MutationRegisterArgs = {
   username: Scalars['String']
-  password: Scalars['String']
 }
 
 export type MutationSendMessageArgs = {
@@ -61,14 +60,26 @@ export type MutationSendMessageArgs = {
 export type Query = {
   __typename?: 'Query'
   serviceDescription: Scalars['String']
-  me?: Maybe<User>
+  me: User
   chatRoomMessages: MessagesConnection
+  chatRooms: ChatRoomsConnection
 }
 
 export type QueryChatRoomMessagesArgs = {
   chatId: Scalars['ID']
   skip?: Maybe<Scalars['Int']>
   limit?: Maybe<Scalars['Int']>
+}
+
+export type QueryChatRoomsArgs = {
+  skip?: Maybe<Scalars['Int']>
+  limit?: Maybe<Scalars['Int']>
+}
+
+export type RegisterResult = {
+  __typename?: 'RegisterResult'
+  accessToken: Scalars['String']
+  user: User
 }
 
 export type SendMessageInput = {
@@ -90,6 +101,7 @@ export type User = {
   __typename?: 'User'
   id: Scalars['ID']
   username: Scalars['String']
+  avatarUrl: Scalars['String']
 }
 
 export type WithIndex<TObject> = TObject & Record<string, any>
@@ -210,9 +222,10 @@ export type ResolversTypes = ResolversObject<{
   >
   Message: ResolverTypeWrapper<Message>
   ChatRoom: ResolverTypeWrapper<ChatRoom>
+  ChatRoomsConnection: ResolverTypeWrapper<ChatRoomsConnection>
   Mutation: ResolverTypeWrapper<{}>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
-  LoginResult: ResolverTypeWrapper<LoginResult>
+  RegisterResult: ResolverTypeWrapper<RegisterResult>
   SendMessageInput: SendMessageInput
   Subscription: ResolverTypeWrapper<{}>
 }>
@@ -229,9 +242,10 @@ export type ResolversParentTypes = ResolversObject<{
   }
   Message: Message
   ChatRoom: ChatRoom
+  ChatRoomsConnection: ChatRoomsConnection
   Mutation: {}
   Boolean: Scalars['Boolean']
-  LoginResult: LoginResult
+  RegisterResult: RegisterResult
   SendMessageInput: SendMessageInput
   Subscription: {}
 }>
@@ -244,12 +258,12 @@ export type ChatRoomResolvers<
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }>
 
-export type LoginResultResolvers<
+export type ChatRoomsConnectionResolvers<
   ContextType = Context,
-  ParentType extends ResolversParentTypes['LoginResult'] = ResolversParentTypes['LoginResult']
+  ParentType extends ResolversParentTypes['ChatRoomsConnection'] = ResolversParentTypes['ChatRoomsConnection']
 > = ResolversObject<{
-  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
+  nodes?: Resolver<Array<ResolversTypes['ChatRoom']>, ParentType, ContextType>
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 }>
 
 export type MessageResolvers<
@@ -275,11 +289,11 @@ export type MutationResolvers<
   ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = ResolversObject<{
   noop?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
-  login?: Resolver<
-    ResolversTypes['LoginResult'],
+  register?: Resolver<
+    ResolversTypes['RegisterResult'],
     ParentType,
     ContextType,
-    RequireFields<MutationLoginArgs, 'username' | 'password'>
+    RequireFields<MutationRegisterArgs, 'username'>
   >
   sendMessage?: Resolver<
     ResolversTypes['Message'],
@@ -298,13 +312,27 @@ export type QueryResolvers<
     ParentType,
     ContextType
   >
-  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
+  me?: Resolver<ResolversTypes['User'], ParentType, ContextType>
   chatRoomMessages?: Resolver<
     ResolversTypes['MessagesConnection'],
     ParentType,
     ContextType,
     RequireFields<QueryChatRoomMessagesArgs, 'chatId' | 'skip' | 'limit'>
   >
+  chatRooms?: Resolver<
+    ResolversTypes['ChatRoomsConnection'],
+    ParentType,
+    ContextType,
+    RequireFields<QueryChatRoomsArgs, 'skip' | 'limit'>
+  >
+}>
+
+export type RegisterResultResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['RegisterResult'] = ResolversParentTypes['RegisterResult']
+> = ResolversObject<{
+  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
 }>
 
 export type SubscriptionResolvers<
@@ -332,15 +360,17 @@ export type UserResolvers<
 > = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  avatarUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }>
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
   ChatRoom?: ChatRoomResolvers<ContextType>
-  LoginResult?: LoginResultResolvers<ContextType>
+  ChatRoomsConnection?: ChatRoomsConnectionResolvers<ContextType>
   Message?: MessageResolvers<ContextType>
   MessagesConnection?: MessagesConnectionResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
+  RegisterResult?: RegisterResultResolvers<ContextType>
   Subscription?: SubscriptionResolvers<ContextType>
   User?: UserResolvers<ContextType>
 }>

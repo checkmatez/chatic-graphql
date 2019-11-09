@@ -6,6 +6,29 @@ import { ENV } from './constants'
 import { ChatRoom, Message, User } from './database'
 import { TokenPayload } from '../types/context'
 import { pubsub } from './pubsub'
+import fetch from 'node-fetch'
+
+const getGithubUser = (name: string) =>
+  fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${ENV.GITHUB_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query: `
+  query user($name: String!){
+    user(login: $name) {
+      id
+      name
+      avatarUrl
+    }
+  }
+  `,
+      variables: { name },
+    }),
+  })
+    .then(response => response.json())
+    .then(result => result.data.user)
 
 export const context: ApolloServerExpressConfig['context'] = ({
   req,
@@ -22,5 +45,12 @@ export const context: ApolloServerExpressConfig['context'] = ({
     }
   }
 
-  return { userId, pubsub, ChatRoom, Message, User }
+  return {
+    userId,
+    pubsub,
+    ChatRoom,
+    Message,
+    User,
+    getGithubUser,
+  }
 }

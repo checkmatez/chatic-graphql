@@ -1,3 +1,4 @@
+import { Context } from '../types/context'
 import { gql, UserInputError } from 'apollo-server'
 import * as jwt from 'jsonwebtoken'
 
@@ -7,43 +8,49 @@ import { MutationResolvers, QueryResolvers } from './../types/graphql'
 
 export const typeDefs = gql`
   extend type Query {
-    me: User
+    me: User!
   }
 
   extend type Mutation {
-    login(username: String!, password: String!): LoginResult!
+    register(username: String!): RegisterResult!
   }
 
   type User {
     id: ID!
     username: String!
+    avatarUrl: String!
   }
 
-  type LoginResult {
+  type RegisterResult {
     accessToken: String!
     user: User!
   }
 `
 
-const me: QueryResolvers['me'] = async (parent, args, context, info) => {
+const me = async (_, __, context: Context) => {
   if (!context.userId) {
-    return null
+    return undefined
   }
   const user = await context.User.query().findById(context.userId)
   return user
 }
 
-const login: MutationResolvers['login'] = async (
+const register: MutationResolvers['register'] = async (
   parent,
   args,
   context,
   info,
 ) => {
-  const user = await context.User.query().findOne(args)
+  const user = await context.getGithubUser(args.username)
   console.log('TCL: user', user)
   if (!user) {
-    throw new UserInputError('Неправильный логин или пароль')
+    throw new UserInputError('Такого пользователя нет')
   }
+  await context.User.query().upsertGraph({
+    id: user.id,
+    username: user.name,
+    password: '1',
+  })
 
   const payload: TokenPayload = { userId: user.id }
   const accessToken = jwt.sign(payload, ENV.APP_SECRET, {
@@ -52,7 +59,7 @@ const login: MutationResolvers['login'] = async (
 
   return {
     accessToken,
-    user,
+    user: { ...user, username: user.name },
   }
 }
 
@@ -61,6 +68,6 @@ export const resolvers = {
     me,
   },
   Mutation: {
-    login,
+    register,
   },
 }
