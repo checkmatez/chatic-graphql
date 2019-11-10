@@ -4,7 +4,6 @@ import { applyMiddleware } from 'graphql-middleware'
 import { context } from './config/context'
 import { schema } from './modules/_schema'
 import { permissions } from './middleware/permissions'
-import { knex } from './config/database'
 
 const server = new ApolloServer({
   schema: applyMiddleware(schema, permissions),

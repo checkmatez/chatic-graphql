@@ -97,3 +97,5 @@ Thumbs.db
 # Build artifacts
 dist/
 build/
+
+server/k8s

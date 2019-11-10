@@ -1,10 +1,10 @@
-import { Context } from '../types/context'
 import { gql, UserInputError } from 'apollo-server'
 import * as jwt from 'jsonwebtoken'
+import * as bcrypt from 'bcryptjs'
 
 import { ACCESS_TOKEN_EXPIRES_IN, ENV } from '../config/constants'
-import { TokenPayload } from '../types/context'
-import { MutationResolvers, QueryResolvers } from './../types/graphql'
+import { Context, TokenPayload } from '../types/context'
+import { MutationResolvers } from './../types/graphql'
 
 export const typeDefs = gql`
   extend type Query {
@@ -12,7 +12,7 @@ export const typeDefs = gql`
   }
 
   extend type Mutation {
-    register(username: String!): RegisterResult!
+    login(username: String!, password: String!): LoginResult!
   }
 
   type User {
@@ -21,7 +21,7 @@ export const typeDefs = gql`
     avatarUrl: String!
   }
 
-  type RegisterResult {
+  type LoginResult {
     accessToken: String!
     user: User!
   }
@@ -35,22 +35,31 @@ const me = async (_, __, context: Context) => {
   return user
 }
 
-const register: MutationResolvers['register'] = async (
+const login: MutationResolvers['login'] = async (
   parent,
-  args,
-  context,
+  { username, password },
+  { User },
   info,
 ) => {
-  const user = await context.getGithubUser(args.username)
-  console.log('TCL: user', user)
-  if (!user) {
-    throw new UserInputError('Такого пользователя нет')
+  if (username.length < 3) {
+    throw new UserInputError('Имя пользователя минимум 3 символа')
   }
-  await context.User.query().upsertGraph({
-    id: user.id,
-    username: user.name,
-    password: '1',
-  })
+  if (password.length < 3) {
+    throw new UserInputError('Пароль минимум 3 символа')
+  }
+  let user = await User.query().findOne({ username })
+
+  if (user) {
+    const valid = await bcrypt.compare(password, user.password)
+    if (!valid) {
+      throw new UserInputError('Неправильный логин или пароль')
+    }
+  } else {
+    const passwordHash = await bcrypt.hash(password, 10)
+    user = await User.query()
+      .insert({ username, password: passwordHash })
+      .returning('*')
+  }
 
   const payload: TokenPayload = { userId: user.id }
   const accessToken = jwt.sign(payload, ENV.APP_SECRET, {
@@ -59,7 +68,7 @@ const register: MutationResolvers['register'] = async (
 
   return {
     accessToken,
-    user: { ...user, username: user.name },
+    user: { ...user, avatarUrl: '' },
   }
 }
 
@@ -68,6 +77,6 @@ export const resolvers = {
     me,
   },
   Mutation: {
-    register,
+    login,
   },
 }

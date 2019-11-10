@@ -1,11 +1,11 @@
 import React from 'react';
-import { AsyncStorage, RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { FlatList, RectButton } from 'react-native-gesture-handler';
+import { RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { NavigationInjectedProps } from 'react-navigation';
 
+import { ChatRoomItem } from '../components/ChatRoomItem';
 import { COLORS } from '../config/styles';
 import { ChatRoom, useChatRoomsQuery } from '../types/graphql';
-import { ChatRoomItem } from '../components/ChatRoomItem';
 
 export const ChatRoomsScreen: React.FC<NavigationInjectedProps> = ({ navigation }) => {
   const { data, networkStatus, error, refetch } = useChatRoomsQuery({
@@ -39,23 +39,6 @@ export const ChatRoomsScreen: React.FC<NavigationInjectedProps> = ({ navigation 
         ListEmptyComponent={listEmpty}
         contentContainerStyle={{ paddingTop: 10 }}
       />
-      <RectButton
-        // style={styles.orderContainer}
-        onPress={() => AsyncStorage.clear()}
-      >
-        <View
-          style={[
-            // styles.mainContainer,
-            {
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 25,
-            },
-          ]}
-        >
-          <Text>Очистить AsyncStorage</Text>
-        </View>
-      </RectButton>
     </View>
   );
 };

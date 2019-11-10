@@ -36,6 +36,12 @@ export type ChatRoomsConnection = {
   total: Scalars['Int']
 }
 
+export type LoginResult = {
+  __typename?: 'LoginResult'
+  accessToken: Scalars['String']
+  user: User
+}
+
 export type Message = {
   __typename?: 'Message'
   id: Scalars['ID']
@@ -54,16 +60,22 @@ export type MessagesConnection = {
 export type Mutation = {
   __typename?: 'Mutation'
   noop?: Maybe<Scalars['Boolean']>
-  register: RegisterResult
+  login: LoginResult
   sendMessage: Message
+  chatRoomCreate: ChatRoom
 }
 
-export type MutationRegisterArgs = {
+export type MutationLoginArgs = {
   username: Scalars['String']
+  password: Scalars['String']
 }
 
 export type MutationSendMessageArgs = {
   data: SendMessageInput
+}
+
+export type MutationChatRoomCreateArgs = {
+  name: Scalars['String']
 }
 
 export type Query = {
@@ -83,12 +95,6 @@ export type QueryChatRoomMessagesArgs = {
 export type QueryChatRoomsArgs = {
   skip?: Maybe<Scalars['Int']>
   limit?: Maybe<Scalars['Int']>
-}
-
-export type RegisterResult = {
-  __typename?: 'RegisterResult'
-  accessToken: Scalars['String']
-  user: User
 }
 
 export type SendMessageInput = {
@@ -231,7 +237,7 @@ export type ResolversTypes = ResolversObject<{
   ChatRoomsConnection: ResolverTypeWrapper<ChatRoomsConnection>
   Mutation: ResolverTypeWrapper<{}>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
-  RegisterResult: ResolverTypeWrapper<RegisterResult>
+  LoginResult: ResolverTypeWrapper<LoginResult>
   SendMessageInput: SendMessageInput
   Subscription: ResolverTypeWrapper<{}>
 }>
@@ -250,7 +256,7 @@ export type ResolversParentTypes = ResolversObject<{
   ChatRoomsConnection: ChatRoomsConnection
   Mutation: {}
   Boolean: Scalars['Boolean']
-  RegisterResult: RegisterResult
+  LoginResult: LoginResult
   SendMessageInput: SendMessageInput
   Subscription: {}
 }>
@@ -276,6 +282,14 @@ export interface DateTimeScalarConfig
   name: 'DateTime'
 }
 
+export type LoginResultResolvers<
+  ContextType = Context,
+  ParentType extends ResolversParentTypes['LoginResult'] = ResolversParentTypes['LoginResult']
+> = ResolversObject<{
+  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
+}>
+
 export type MessageResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']
@@ -300,17 +314,23 @@ export type MutationResolvers<
   ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = ResolversObject<{
   noop?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
-  register?: Resolver<
-    ResolversTypes['RegisterResult'],
+  login?: Resolver<
+    ResolversTypes['LoginResult'],
     ParentType,
     ContextType,
-    RequireFields<MutationRegisterArgs, 'username'>
+    RequireFields<MutationLoginArgs, 'username' | 'password'>
   >
   sendMessage?: Resolver<
     ResolversTypes['Message'],
     ParentType,
     ContextType,
     RequireFields<MutationSendMessageArgs, 'data'>
+  >
+  chatRoomCreate?: Resolver<
+    ResolversTypes['ChatRoom'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationChatRoomCreateArgs, 'name'>
   >
 }>
 
@@ -336,14 +356,6 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryChatRoomsArgs, 'skip' | 'limit'>
   >
-}>
-
-export type RegisterResultResolvers<
-  ContextType = Context,
-  ParentType extends ResolversParentTypes['RegisterResult'] = ResolversParentTypes['RegisterResult']
-> = ResolversObject<{
-  accessToken?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
 }>
 
 export type SubscriptionResolvers<
@@ -378,11 +390,11 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   ChatRoom?: ChatRoomResolvers<ContextType>
   ChatRoomsConnection?: ChatRoomsConnectionResolvers<ContextType>
   DateTime?: GraphQLScalarType
+  LoginResult?: LoginResultResolvers<ContextType>
   Message?: MessageResolvers<ContextType>
   MessagesConnection?: MessagesConnectionResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
-  RegisterResult?: RegisterResultResolvers<ContextType>
   Subscription?: SubscriptionResolvers<ContextType>
   User?: UserResolvers<ContextType>
 }>

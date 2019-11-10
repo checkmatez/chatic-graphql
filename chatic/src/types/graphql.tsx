@@ -29,6 +29,12 @@ export type ChatRoomsConnection = {
   total: Scalars["Int"];
 };
 
+export type LoginResult = {
+  __typename?: "LoginResult";
+  accessToken: Scalars["String"];
+  user: User;
+};
+
 export type Message = {
   __typename?: "Message";
   id: Scalars["ID"];
@@ -47,16 +53,22 @@ export type MessagesConnection = {
 export type Mutation = {
   __typename?: "Mutation";
   noop?: Maybe<Scalars["Boolean"]>;
-  register: RegisterResult;
+  login: LoginResult;
   sendMessage: Message;
+  chatRoomCreate: ChatRoom;
 };
 
-export type MutationRegisterArgs = {
+export type MutationLoginArgs = {
   username: Scalars["String"];
+  password: Scalars["String"];
 };
 
 export type MutationSendMessageArgs = {
   data: SendMessageInput;
+};
+
+export type MutationChatRoomCreateArgs = {
+  name: Scalars["String"];
 };
 
 export type Query = {
@@ -76,12 +88,6 @@ export type QueryChatRoomMessagesArgs = {
 export type QueryChatRoomsArgs = {
   skip?: Maybe<Scalars["Int"]>;
   limit?: Maybe<Scalars["Int"]>;
-};
-
-export type RegisterResult = {
-  __typename?: "RegisterResult";
-  accessToken: Scalars["String"];
-  user: User;
 };
 
 export type SendMessageInput = {
@@ -152,15 +158,13 @@ export type SendMessageMutation = { __typename?: "Mutation" } & {
   sendMessage: { __typename?: "Message" } & MessageFieldsFragment;
 };
 
-export type RegisterMutationVariables = {
+export type LoginMutationVariables = {
   username: Scalars["String"];
+  password: Scalars["String"];
 };
 
-export type RegisterMutation = { __typename?: "Mutation" } & {
-  register: { __typename?: "RegisterResult" } & Pick<
-    RegisterResult,
-    "accessToken"
-  > & {
+export type LoginMutation = { __typename?: "Mutation" } & {
+  login: { __typename?: "LoginResult" } & Pick<LoginResult, "accessToken"> & {
       user: { __typename?: "User" } & Pick<
         User,
         "id" | "username" | "avatarUrl"
@@ -383,9 +387,9 @@ export type SendMessageMutationOptions = ApolloReactCommon.BaseMutationOptions<
   SendMessageMutation,
   SendMessageMutationVariables
 >;
-export const RegisterDocument = gql`
-  mutation register($username: String!) {
-    register(username: $username) {
+export const LoginDocument = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
       accessToken
       user {
         id
@@ -397,38 +401,39 @@ export const RegisterDocument = gql`
 `;
 
 /**
- * __useRegisterMutation__
+ * __useLoginMutation__
  *
- * To run a mutation, you first call `useRegisterMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRegisterMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [registerMutation, { data, loading, error }] = useRegisterMutation({
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
  *   variables: {
  *      username: // value for 'username'
+ *      password: // value for 'password'
  *   },
  * });
  */
-export function useRegisterMutation(
+export function useLoginMutation(
   baseOptions?: ApolloReactHooks.MutationHookOptions<
-    RegisterMutation,
-    RegisterMutationVariables
+    LoginMutation,
+    LoginMutationVariables
   >
 ) {
-  return ApolloReactHooks.useMutation<
-    RegisterMutation,
-    RegisterMutationVariables
-  >(RegisterDocument, baseOptions);
+  return ApolloReactHooks.useMutation<LoginMutation, LoginMutationVariables>(
+    LoginDocument,
+    baseOptions
+  );
 }
-export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
-export type RegisterMutationResult = ApolloReactCommon.MutationResult<
-  RegisterMutation
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = ApolloReactCommon.MutationResult<
+  LoginMutation
 >;
-export type RegisterMutationOptions = ApolloReactCommon.BaseMutationOptions<
-  RegisterMutation,
-  RegisterMutationVariables
+export type LoginMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
 >;

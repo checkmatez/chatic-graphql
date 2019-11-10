@@ -1,15 +1,14 @@
-import { gql, withFilter } from 'apollo-server'
+import { gql } from 'apollo-server'
 
-import {
-  MutationResolvers,
-  QueryResolvers,
-  SubscriptionResolvers,
-} from './../types/graphql'
-import { EventName } from '../config/constants'
+import { MutationResolvers, QueryResolvers } from './../types/graphql'
 
 export const typeDefs = gql`
   extend type Query {
     chatRooms(skip: Int = 0, limit: Int = 20): ChatRoomsConnection!
+  }
+
+  extend type Mutation {
+    chatRoomCreate(name: String!): ChatRoom!
   }
 
   type ChatRoomsConnection {
@@ -35,8 +34,20 @@ const chatRooms: QueryResolvers['chatRooms'] = async (
   return { nodes, total }
 }
 
+const chatRoomCreate: MutationResolvers['chatRoomCreate'] = async (
+  _,
+  { name },
+  { ChatRoom },
+) => {
+  const chatRoom = await ChatRoom.query().insert({ name })
+  return chatRoom
+}
+
 export const resolvers = {
   Query: {
     chatRooms,
+  },
+  Mutation: {
+    chatRoomCreate,
   },
 }

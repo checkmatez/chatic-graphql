@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<void> {
       .notNullable()
       .defaultTo('')
     table
-      .text('author_id')
+      .uuid('author_id')
       .references('id')
       .inTable('users')
       .notNullable()

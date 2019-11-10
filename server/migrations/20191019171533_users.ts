@@ -5,9 +5,10 @@ const TABLE_NAME = 'users'
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable(TABLE_NAME, table => {
     table
-      .text('id')
+      .uuid('id')
       .primary()
       .notNullable()
+      .defaultTo(knex.raw('uuid_generate_v4()'))
     table
       .string('username', 255)
       .unique()

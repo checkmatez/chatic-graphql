@@ -1,3 +1,4 @@
+import React from 'react';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
@@ -5,7 +6,8 @@ import { COLORS } from '../config/styles';
 import { AuthLoadingScreen } from '../screens/AuthLoadingScreen';
 import { ChatRoomScreen } from '../screens/ChatRoomScreen';
 import { ChatRoomsScreen } from '../screens/ChatRoomsScreen';
-import { RegisterScreen } from '../screens/RegisterScreen';
+import { LoginScreen } from '../screens/LoginScreen';
+import { LogoutButton } from './LogoutButton';
 
 const AppStack = createStackNavigator(
   {
@@ -13,6 +15,7 @@ const AppStack = createStackNavigator(
       screen: ChatRoomsScreen,
       navigationOptions: ({ navigation }) => ({
         title: `Доклады`,
+        headerLeft: () => <LogoutButton onPress={() => navigation.navigate('Auth')} />,
       }),
     },
     ChatRoom: {
@@ -31,7 +34,9 @@ const AppStack = createStackNavigator(
     },
   },
 );
-const AuthStack = createStackNavigator({ Register: RegisterScreen });
+const AuthStack = createStackNavigator({
+  Login: { screen: LoginScreen, navigationOptions: { header: null } },
+});
 
 const SwitchNavigator = createSwitchNavigator(
   {

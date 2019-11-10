@@ -3,18 +3,19 @@ import { StyleSheet, Text, TextInput, View, AsyncStorage } from 'react-native';
 
 import { Button } from '../components/Button';
 import { COLORS } from '../config/styles';
-import { useRegisterMutation } from '../types/graphql';
+import { useLoginMutation } from '../types/graphql';
 import { NavigationInjectedProps } from 'react-navigation';
 import { ACCESS_TOKEN_KEY } from '../config/constants';
 
-export const RegisterScreen: React.FC<NavigationInjectedProps> = ({ navigation }) => {
+export const LoginScreen: React.FC<NavigationInjectedProps> = ({ navigation }) => {
   const [isSettingToken, setIsSettingToken] = React.useState(false);
   const [username, setUsername] = React.useState('');
-  const [register, { loading, error }] = useRegisterMutation({
-    variables: { username },
+  const [password, setPassword] = React.useState('');
+  const [login, { loading, error }] = useLoginMutation({
+    variables: { username, password },
     onCompleted: async data => {
       setIsSettingToken(true);
-      await AsyncStorage.setItem(ACCESS_TOKEN_KEY, data.register.accessToken);
+      await AsyncStorage.setItem(ACCESS_TOKEN_KEY, data.login.accessToken);
       setIsSettingToken(false);
       navigation.navigate('App');
     },
@@ -24,23 +25,35 @@ export const RegisterScreen: React.FC<NavigationInjectedProps> = ({ navigation }
     <View style={styles.root}>
       <TextInput
         value={username}
-        placeholder="GitHub username"
+        placeholder="Логин для входа"
         keyboardType="default"
         maxLength={30}
         autoFocus
         blurOnSubmit
-        // placeholderTextColor={COLORS.basic.dim}
-        // selectionColor={COLORS.basic.dim}
         underlineColorAndroid="transparent"
         textBreakStrategy="highQuality"
         onChangeText={value => setUsername(value)}
+        style={styles.input}
+      />
+      <TextInput
+        value={password}
+        placeholder="Пароль"
+        keyboardType="default"
+        autoCompleteType="password"
+        maxLength={30}
+        secureTextEntry
+        autoFocus
+        blurOnSubmit
+        underlineColorAndroid="transparent"
+        textBreakStrategy="highQuality"
+        onChangeText={value => setPassword(value)}
         style={styles.input}
       />
       {error && <Text>{error.message}</Text>}
       <View style={styles.buttonContainer}>
         <Button
           title="Войти"
-          onPress={() => register()}
+          onPress={() => login()}
           disabled={isSettingToken || loading || !username.length}
           loading={loading}
         />

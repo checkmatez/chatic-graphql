@@ -11,6 +11,7 @@ export const ENV = cleanEnv(
     DB_PASSWORD: { type: 'string', _parse: String },
     PORT: { type: 'number', _parse: Number },
     GITHUB_TOKEN: { type: 'string', _parse: String },
+    SUPER_USER_ID: { type: 'string', _parse: String },
   },
   { dotEnvPath: null, strict: true },
 )

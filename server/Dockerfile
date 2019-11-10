@@ -1,5 +1,3 @@
-# Указанная версия будет использоваться по умолчанию при локальной сборке, при
-# сборке в Gitlab будет использована версия Node, указанная в `.gitlab-ci.yml`.
 ARG NODE_VERSION=10.16
 
 FROM node:${NODE_VERSION}-alpine as builder
