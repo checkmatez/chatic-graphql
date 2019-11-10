@@ -19,5 +19,6 @@
     "typeRoots": ["node_modules", "src/types"],
     "rootDir": "./src",
     "outDir": "./dist"
-  }
+  },
+  "include": ["src/**/*"]
 }

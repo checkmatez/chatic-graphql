@@ -43,7 +43,7 @@ export const typeDefs = gql`
   }
 `
 
-const chatRoomMessages: QueryResolvers['chatRoomMessages'] = async (
+const chatRoomMessages = async (
   _,
   { chatId, skip, limit },
   { userId, Message },
@@ -55,7 +55,7 @@ const chatRoomMessages: QueryResolvers['chatRoomMessages'] = async (
   return { nodes, total }
 }
 
-const sendMessage: MutationResolvers['sendMessage'] = async (
+const sendMessage = async (
   _,
   { data: { text, chatId } },
   { Message, userId, pubsub },

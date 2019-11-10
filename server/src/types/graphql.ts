@@ -1,8 +1,10 @@
-import { GraphQLResolveInfo } from 'graphql'
-import Message from '../models/message'
+import {
+  GraphQLResolveInfo,
+  GraphQLScalarType,
+  GraphQLScalarTypeConfig,
+} from 'graphql'
 import { Context } from './context'
 export type Maybe<T> = T | null
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type RequireFields<T, K extends keyof T> = {
   [X in Exclude<keyof T, K>]?: T[X]
 } &
@@ -14,6 +16,12 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
+  /**
+   * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
+   * `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
+   * 8601 standard for representation of dates and times using the Gregorian calendar.
+   **/
+  DateTime: Date
 }
 
 export type ChatRoom = {
@@ -31,6 +39,7 @@ export type ChatRoomsConnection = {
 export type Message = {
   __typename?: 'Message'
   id: Scalars['ID']
+  sentAt: Scalars['DateTime']
   text: Scalars['String']
   sender: User
   chatRoom: ChatRoom
@@ -215,12 +224,9 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>
   ID: ResolverTypeWrapper<Scalars['ID']>
   Int: ResolverTypeWrapper<Scalars['Int']>
-  MessagesConnection: ResolverTypeWrapper<
-    Omit<MessagesConnection, 'nodes'> & {
-      nodes: Array<ResolversTypes['Message']>
-    }
-  >
+  MessagesConnection: ResolverTypeWrapper<MessagesConnection>
   Message: ResolverTypeWrapper<Message>
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']>
   ChatRoom: ResolverTypeWrapper<ChatRoom>
   ChatRoomsConnection: ResolverTypeWrapper<ChatRoomsConnection>
   Mutation: ResolverTypeWrapper<{}>
@@ -237,10 +243,9 @@ export type ResolversParentTypes = ResolversObject<{
   User: User
   ID: Scalars['ID']
   Int: Scalars['Int']
-  MessagesConnection: Omit<MessagesConnection, 'nodes'> & {
-    nodes: Array<ResolversParentTypes['Message']>
-  }
+  MessagesConnection: MessagesConnection
   Message: Message
+  DateTime: Scalars['DateTime']
   ChatRoom: ChatRoom
   ChatRoomsConnection: ChatRoomsConnection
   Mutation: {}
@@ -266,11 +271,17 @@ export type ChatRoomsConnectionResolvers<
   total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 }>
 
+export interface DateTimeScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+  name: 'DateTime'
+}
+
 export type MessageResolvers<
   ContextType = Context,
   ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']
 > = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>
+  sentAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
   text?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   sender?: Resolver<ResolversTypes['User'], ParentType, ContextType>
   chatRoom?: Resolver<ResolversTypes['ChatRoom'], ParentType, ContextType>
@@ -366,6 +377,7 @@ export type UserResolvers<
 export type Resolvers<ContextType = Context> = ResolversObject<{
   ChatRoom?: ChatRoomResolvers<ContextType>
   ChatRoomsConnection?: ChatRoomsConnectionResolvers<ContextType>
+  DateTime?: GraphQLScalarType
   Message?: MessageResolvers<ContextType>
   MessagesConnection?: MessagesConnectionResolvers<ContextType>
   Mutation?: MutationResolvers<ContextType>

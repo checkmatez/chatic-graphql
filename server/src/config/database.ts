@@ -6,7 +6,7 @@ import ChatRoom from '../models/chat-room'
 import Message from '../models/message'
 import User from '../models/user'
 
-const knex = Knex({
+export const knex = Knex({
   client: 'pg',
   connection: {
     host: ENV.DB_HOST,

@@ -10,9 +10,8 @@
     "lint": "eslint src/**/*.ts",
     "format": "prettier --config .prettierrc --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "knex": "dotenv knex",
-    "gen2": "node -r dotenv/config ./node_modules/@graphql-codegen/cli/dist/commonjs/cli.js",
-    "gen": "gql-gen",
-    "zeus": "zeus"
+    "gen": "dotenv gql-gen",
+    "migrate": "knex migrate:latest"
   },
   "dependencies": {
     "apollo-server": "^2.9.6",
@@ -29,12 +28,14 @@
     "node-fetch": "^2.6.0",
     "objection": "^1.6.11",
     "objection-db-errors": "^1.1.1",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.8.1",
-    "@graphql-codegen/typescript": "^1.8.1",
-    "@graphql-codegen/typescript-resolvers": "^1.8.1",
+    "@graphql-codegen/cli": "^1.8.3",
+    "@graphql-codegen/typescript": "^1.8.3",
+    "@graphql-codegen/typescript-resolvers": "^1.8.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/graphql-iso-date": "^3.3.3",
     "@types/jsonwebtoken": "^8.3.5",
@@ -49,9 +50,7 @@
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "nodemon": "^1.19.4",
-    "prettier": "^1.18.2",
-    "ts-node": "^8.4.1",
-    "typescript": "^3.6.4"
+    "prettier": "^1.19.1"
   },
   "husky": {
     "hooks": {

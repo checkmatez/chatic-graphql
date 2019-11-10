@@ -1,12 +1,12 @@
-import { Context } from './../types/context'
 import { ApolloServerExpressConfig } from 'apollo-server-express'
 import * as jwt from 'jsonwebtoken'
+import fetch from 'node-fetch'
 
+import { TokenPayload } from '../types/context'
+import { Context } from './../types/context'
 import { ENV } from './constants'
 import { ChatRoom, Message, User } from './database'
-import { TokenPayload } from '../types/context'
 import { pubsub } from './pubsub'
-import fetch from 'node-fetch'
 
 const getGithubUser = (name: string) =>
   fetch('https://api.github.com/graphql', {
