@@ -61,6 +61,7 @@ export type Mutation = {
   __typename?: 'Mutation'
   noop?: Maybe<Scalars['Boolean']>
   login: LoginResult
+  loginWithGithub: LoginResult
   sendMessage: Message
   chatRoomCreate: ChatRoom
 }
@@ -68,6 +69,10 @@ export type Mutation = {
 export type MutationLoginArgs = {
   username: Scalars['String']
   password: Scalars['String']
+}
+
+export type MutationLoginWithGithubArgs = {
+  code: Scalars['String']
 }
 
 export type MutationSendMessageArgs = {
@@ -319,6 +324,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationLoginArgs, 'username' | 'password'>
+  >
+  loginWithGithub?: Resolver<
+    ResolversTypes['LoginResult'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationLoginWithGithubArgs, 'code'>
   >
   sendMessage?: Resolver<
     ResolversTypes['Message'],

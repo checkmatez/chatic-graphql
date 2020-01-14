@@ -1,5 +1,5 @@
 export const COLORS = {
-  default: '#8800FF',
+  default: 'rgb(12,25,49)',
   wash: '#EDEDED',
   dim: '#A29CA7',
   background: 'rgb(17,60,120)',

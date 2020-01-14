@@ -12,3 +12,16 @@ export const LOGIN_MUTATION = gql`
     }
   }
 `;
+
+export const LOGIN_WITH_GITHUB_MUTATION = gql`
+  mutation loginWithGithub($code: String!) {
+    loginWithGithub(code: $code) {
+      accessToken
+      user {
+        id
+        username
+        avatarUrl
+      }
+    }
+  }
+`;

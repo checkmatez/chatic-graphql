@@ -13,13 +13,12 @@ interface MessageBubbleProps {
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ text, sentAt }) => {
   const slideFromLeft = React.useRef(new Animated.Value(-1)).current;
-  console.log({ sentAt });
 
   React.useEffect(() => {
     Animated.spring(slideFromLeft, {
       toValue: 0,
       speed: 7,
-      bounciness: 12,
+      bounciness: 16,
       useNativeDriver: true,
     }).start();
   }, []);

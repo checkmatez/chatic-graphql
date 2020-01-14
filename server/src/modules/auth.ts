@@ -1,6 +1,7 @@
 import { gql, UserInputError } from 'apollo-server'
 import * as jwt from 'jsonwebtoken'
 import * as bcrypt from 'bcryptjs'
+import fetch from 'node-fetch'
 
 import { ACCESS_TOKEN_EXPIRES_IN, ENV } from '../config/constants'
 import { Context, TokenPayload } from '../types/context'
@@ -13,6 +14,7 @@ export const typeDefs = gql`
 
   extend type Mutation {
     login(username: String!, password: String!): LoginResult!
+    loginWithGithub(code: String!): LoginResult!
   }
 
   type User {
@@ -72,11 +74,70 @@ const login: MutationResolvers['login'] = async (
   }
 }
 
+const loginWithGithub: MutationResolvers['loginWithGithub'] = async (
+  parent,
+  { code },
+  { User },
+  info,
+) => {
+  let url =
+    'https://github.com/login/oauth/access_token' +
+    `?client_id=${ENV.GITHUB_CLIENT_ID}` +
+    `&client_secret=${ENV.GITHUB_CLIENT_SECRET}` +
+    `&code=${code}`
+
+  let response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+
+  let result = await response.json()
+  console.log({ result })
+
+  url =
+    'https://api.github.com/user' +
+    `?client_id=${ENV.GITHUB_CLIENT_ID}` +
+    `&client_secret=${ENV.GITHUB_CLIENT_SECRET}` +
+    `&code=${code}`
+
+  response = await fetch(url, {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `token ${result.access_token}`,
+    },
+  })
+  result = await response.json()
+  console.log({ result })
+
+  const user = await User.query()
+    .insert({
+      username: result.name,
+      password: '',
+      avatarUrl: result.avatar_url,
+    })
+    .returning('*')
+
+  const payload: TokenPayload = { userId: user.id }
+  const accessToken = jwt.sign(payload, ENV.APP_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+  })
+
+  return {
+    accessToken,
+    user: { ...user, avatarUrl: '' },
+  }
+}
+
 export const resolvers = {
   Query: {
     me,
   },
   Mutation: {
     login,
+    loginWithGithub,
   },
 }

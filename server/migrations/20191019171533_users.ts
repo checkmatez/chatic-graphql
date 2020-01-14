@@ -14,6 +14,7 @@ export async function up(knex: Knex): Promise<void> {
       .unique()
       .notNullable()
     table.string('password', 1023).notNullable()
+    table.string('avatar_url', 1023).notNullable()
     table.timestamps(true, true)
     table.timestamp('deleted_at')
   })

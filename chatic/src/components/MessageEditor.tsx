@@ -1,8 +1,8 @@
+import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { InputAccessoryView, StyleSheet, TextInput, View } from 'react-native';
 import { BorderlessButton } from 'react-native-gesture-handler';
 
-import { COLORS } from '../config/styles';
 import { useSendMessageMutation } from '../types/graphql';
 
 interface MessageEditorProps {
@@ -20,30 +20,38 @@ export const MessageEditor: React.FC<MessageEditorProps> = ({ chatId }) => {
   const handleSend = () => {
     sendMessage();
   };
+
   return (
-    <View style={styles.container}>
-      <TextInput
-        value={message}
-        placeholder="Сообщение"
-        keyboardType="default"
-        returnKeyType="send"
-        maxLength={100}
-        blurOnSubmit
-        underlineColorAndroid="transparent"
-        textBreakStrategy="highQuality"
-        onChangeText={value => setMessage(value)}
-        onSubmitEditing={handleSend}
-        style={styles.messageInput}
-      />
-      <BorderlessButton onPress={loading ? undefined : handleSend} style={styles.sendButton}>
-        <View />
-      </BorderlessButton>
-    </View>
+    <InputAccessoryView>
+      <View style={styles.container}>
+        <TextInput
+          value={message}
+          placeholder="Сообщение"
+          keyboardType="default"
+          returnKeyType="send"
+          maxLength={100}
+          blurOnSubmit
+          underlineColorAndroid="transparent"
+          textBreakStrategy="highQuality"
+          onChangeText={value => setMessage(value)}
+          onSubmitEditing={handleSend}
+          style={styles.messageInput}
+        />
+        <BorderlessButton onPress={loading ? undefined : handleSend} style={styles.sendButton}>
+          <FontAwesome name="send" color="white" size={26} />
+        </BorderlessButton>
+      </View>
+    </InputAccessoryView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+    paddingHorizontal: 15,
+  },
   messageInput: {
     flex: 1,
     fontSize: 20,
@@ -53,10 +61,13 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   sendButton: {
-    backgroundColor: 'purple',
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: 'white',
     marginLeft: 10,
-    width: 40,
-    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

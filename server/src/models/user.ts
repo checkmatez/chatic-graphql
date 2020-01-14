@@ -9,6 +9,7 @@ class User extends BaseModel {
 
   public username!: string
   public password!: string
+  public avatarUrl!: string
 }
 
 export default User
