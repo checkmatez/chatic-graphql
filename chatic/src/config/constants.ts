@@ -9,10 +9,10 @@ export const getGraphqlEndpoint = () => {
   //   return 'http://localhost:4000'; // Local server
   // }
 
-  // return 'https://api.car.sydev.tech'; // Production server
+  // return 'https://some.server'; // Production server
 };
 
 export const getWsGraphqlEndpoint = () => {
   return 'ws://localhost:4000/graphql';
-  // return 'ws://35.228.32.187:30819/graphql';
+  // return 'wss://some.server/graphql'; // Production server
 };
