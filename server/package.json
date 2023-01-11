@@ -23,7 +23,7 @@
     "graphql-postgres-subscriptions": "^1.0.5",
     "graphql-shield": "^7.0.2",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^0.20.1",
+    "knex": "^2.4.0",
     "lodash": "^4.17.15",
     "node-fetch": "^2.6.0",
     "objection": "^1.6.11",
