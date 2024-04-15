@@ -1,4 +1,4 @@
 # chatic-graphql
-Демо-пример реализации чата для мобильных приложений.
+Demo app for mobile app chat implementation.
 
-Изначально задумывалось как приложение для конференций, где во время выступления докладчиков зрители могут обсуждать доклады в реальном времени в приложении.
+Could be used as an app for conferences where users can chat in real time during a presentation.
